@@ -5,7 +5,7 @@
 //  Created by Robert Magnusson on 17.10.24.
 //
 
-class Provider<T>: Hashable {
+public class Provider<T>: Hashable {
     init(scope: ProviderScope = .singleton, _ builder: @escaping (SwiftPod) -> T) {
         self.builder = builder
         self.scope = scope
@@ -18,11 +18,11 @@ class Provider<T>: Hashable {
         return builder(pod)
     }
 
-    static func == (lhs: Provider<T>, rhs: Provider<T>) -> Bool {
+    public static func == (lhs: Provider<T>, rhs: Provider<T>) -> Bool {
         return lhs === rhs
     }
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self))
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-class SwiftPod {
+public class SwiftPod {
     private var instanceDict = [AnyProvider: Any]()
 
     private var overrideInstanceDict = [AnyProvider: Any]()

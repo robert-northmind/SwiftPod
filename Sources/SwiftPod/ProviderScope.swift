@@ -6,7 +6,7 @@
 //
 
 /// Controls the life time of the instances which your providers creates
-enum ProviderScope {
+public enum ProviderScope {
     /// The first time you resolve an instance with this scope, it will be created and persisted.
     /// If you try to resolve it again, then the initially created instance will be returned.
     case singleton
