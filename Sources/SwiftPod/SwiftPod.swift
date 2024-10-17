@@ -8,12 +8,14 @@
 import Foundation
 
 public class SwiftPod {
+    public init() {}
+
     private var instanceDict = [AnyProvider: Any]()
 
     private var overrideInstanceDict = [AnyProvider: Any]()
     private var overrideProviderBuilderDict = [AnyProvider: AnyProvider]()
 
-    func resolve<T>(_ provider: Provider<T>) -> T {
+    public func resolve<T>(_ provider: Provider<T>) -> T {
         let anyProvider = AnyProvider(provider)
 
         if isProviderOverriden(anyProvider) {
@@ -45,13 +47,13 @@ public class SwiftPod {
         return overrideProviderBuilderDict[anyProvider] != nil
     }
 
-    func overrideProvider<T>(_ provider: Provider<T>, with builder: (SwiftPod) -> T) {
+    public func overrideProvider<T>(_ provider: Provider<T>, with builder: (SwiftPod) -> T) {
         let anyProvider = AnyProvider(provider)
         overrideInstanceDict.removeValue(forKey: anyProvider)
         overrideProviderBuilderDict[anyProvider] = anyProvider
     }
 
-    func removeOverrideProvider<T>(_ provider: Provider<T>) {
+    public func removeOverrideProvider<T>(_ provider: Provider<T>) {
         let anyProvider = AnyProvider(provider)
         overrideInstanceDict.removeValue(forKey: anyProvider)
         overrideProviderBuilderDict.removeValue(forKey: anyProvider)
