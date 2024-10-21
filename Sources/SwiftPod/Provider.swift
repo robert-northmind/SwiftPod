@@ -6,7 +6,7 @@
 //
 
 public class Provider<T>: Hashable {
-    public init(scope: ProviderScope = .singleton, _ builder: @escaping (SwiftPod) -> T) {
+    public init(scope: ProviderScope = SingletonScope(), _ builder: @escaping (SwiftPod) -> T) {
         self.builder = builder
         self.scope = scope
     }

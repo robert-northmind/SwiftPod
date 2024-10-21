@@ -18,18 +18,22 @@ public class SwiftPod {
     public func resolve<T>(_ provider: Provider<T>) -> T {
         let anyProvider = AnyProvider(provider)
 
-        if isProviderOverriden(anyProvider) {
-            if let instance = overrideInstanceDict[anyProvider] as? T {
+        if isProviderOverridden(anyProvider) {
+            let overrideAnyProvider = overrideProviderBuilderDict[anyProvider]
+            let overrideProvider = overrideAnyProvider?.base as? Provider<T>
+            let shouldAlwaysCreateNewInstance = overrideProvider?.scope is AlwaysCreateNewScope
+            
+            if !shouldAlwaysCreateNewInstance, let instance = overrideInstanceDict[anyProvider] as? T {
                 return instance
             }
-            let overrideAnyProvider = overrideProviderBuilderDict[anyProvider]
+
             if let newInstance = overrideAnyProvider?.build(pod: self) as? T {
                 overrideInstanceDict[anyProvider] = newInstance
                 return newInstance
             }
         }
 
-        let shouldAlwaysCreateNewInstance = provider.scope == .alwaysCreateNew
+        let shouldAlwaysCreateNewInstance = provider.scope is AlwaysCreateNewScope
 
         if !shouldAlwaysCreateNewInstance, let instance = instanceDict[anyProvider] as? T {
             return instance
@@ -43,14 +47,23 @@ public class SwiftPod {
         return newInstance
     }
 
-    private func isProviderOverriden(_ anyProvider: AnyProvider) -> Bool {
+    private func isProviderOverridden(_ anyProvider: AnyProvider) -> Bool {
         return overrideProviderBuilderDict[anyProvider] != nil
     }
 
-    public func overrideProvider<T>(_ provider: Provider<T>, with builder: (SwiftPod) -> T) {
+    public func overrideProvider<T>(
+        _ provider: Provider<T>,
+        with builder: @escaping (SwiftPod) -> T,
+        scope: ProviderScope? = nil
+    ) {
         let anyProvider = AnyProvider(provider)
+        let overrideAnyProvider = AnyProvider(Provider(
+            scope: scope ?? provider.scope,
+            builder
+        ))
+        
         overrideInstanceDict.removeValue(forKey: anyProvider)
-        overrideProviderBuilderDict[anyProvider] = anyProvider
+        overrideProviderBuilderDict[anyProvider] = overrideAnyProvider
     }
 
     public func removeOverrideProvider<T>(_ provider: Provider<T>) {
