@@ -15,35 +15,32 @@ public class SwiftPod {
     private var overrideInstanceDict = [AnyProvider: Any]()
     private var overrideProviderBuilderDict = [AnyProvider: AnyProvider]()
 
-    public func resolve<T>(_ provider: Provider<T>) -> T {
-        let anyProvider = AnyProvider(provider)
+    public func resolve<T>(_ originalProvider: Provider<T>) -> T {
+        let originalAnyProvider = AnyProvider(originalProvider)
+        let overrideAnyProvider = overrideProviderBuilderDict[originalAnyProvider]
+        let anyProvider = overrideAnyProvider ?? originalAnyProvider
 
-        if isProviderOverridden(anyProvider) {
-            let overrideAnyProvider = overrideProviderBuilderDict[anyProvider]
-            let overrideProvider = overrideAnyProvider?.base as? Provider<T>
-            let shouldAlwaysCreateNewInstance = overrideProvider?.scope is AlwaysCreateNewScope
-            
-            if !shouldAlwaysCreateNewInstance, let instance = overrideInstanceDict[anyProvider] as? T {
+        let wasOverridden = isProviderOverridden(originalAnyProvider)
+        let provider = anyProvider.base as? Provider<T> ?? originalProvider
+        
+        let isAllowedToCacheInstance = !(provider.scope is AlwaysCreateNewScope)
+        
+        if isAllowedToCacheInstance {
+            if wasOverridden, let instance = overrideInstanceDict[anyProvider] as? T {
+                return instance
+            } else if let instance = instanceDict[anyProvider] as? T {
                 return instance
             }
-
-            if let newInstance = overrideAnyProvider?.build(pod: self) as? T {
+        }
+        
+        let newInstance = provider.build(self)
+        if isAllowedToCacheInstance {
+            if wasOverridden {
                 overrideInstanceDict[anyProvider] = newInstance
-                return newInstance
+            } else {
+                instanceDict[anyProvider] = newInstance
             }
         }
-
-        let shouldAlwaysCreateNewInstance = provider.scope is AlwaysCreateNewScope
-
-        if !shouldAlwaysCreateNewInstance, let instance = instanceDict[anyProvider] as? T {
-            return instance
-        }
-        let newInstance = provider.build(self)
-
-        if !shouldAlwaysCreateNewInstance {
-            instanceDict[anyProvider] = newInstance
-        }
-
         return newInstance
     }
 
