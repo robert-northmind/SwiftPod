@@ -7,15 +7,22 @@
 
 import Foundation
 
-public class SwiftPod {
+public final class SwiftPod: ProviderResolver {
     public init() {}
 
     private var instanceDict = [AnyProvider: Any]()
 
     private var overrideInstanceDict = [AnyProvider: Any]()
     private var overrideProviderBuilderDict = [AnyProvider: AnyProvider]()
-
+    
     public func resolve<T>(_ originalProvider: Provider<T>) -> T {
+        return resolve(originalProvider, processingAnyProviders: nil)
+    }
+
+    func resolve<T>(
+        _ originalProvider: Provider<T>,
+        processingAnyProviders: ProcessingAnyProviders?
+    ) -> T {
         let originalAnyProvider = AnyProvider(originalProvider)
         let overrideAnyProvider = overrideProviderBuilderDict[originalAnyProvider]
         let anyProvider = overrideAnyProvider ?? originalAnyProvider
@@ -32,8 +39,21 @@ public class SwiftPod {
                 return instance
             }
         }
+
+        // Check cyclic providers
+        if let processingAnyProviders = processingAnyProviders, processingAnyProviders.contains(anyProvider) {
+            let providerDescriptions = processingAnyProviders.cycleErrorDescription(anyProvider)
+            assert(false, "\n\(providerDescriptions)");
+        }
+        // Passed! Not cycle detected
+
+        let newInstance = provider.build(
+            InternalProviderResolver(
+                self,
+                processingAnyProviders: ProcessingAnyProviders.getUpdated(processingAnyProviders, withAnyProvider: anyProvider)
+            )
+        )
         
-        let newInstance = provider.build(self)
         if isAllowedToCacheInstance {
             if wasOverridden {
                 overrideInstanceDict[anyProvider] = newInstance
@@ -50,7 +70,7 @@ public class SwiftPod {
 
     public func overrideProvider<T>(
         _ provider: Provider<T>,
-        with builder: @escaping (SwiftPod) -> T,
+        with builder: @escaping (ProviderResolver) -> T,
         scope: ProviderScope? = nil
     ) {
         let anyProvider = AnyProvider(provider)

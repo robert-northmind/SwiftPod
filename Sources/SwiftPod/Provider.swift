@@ -6,16 +6,16 @@
 //
 
 public class Provider<T>: Hashable {
-    public init(scope: ProviderScope = SingletonScope(), _ builder: @escaping (SwiftPod) -> T) {
+    public init(scope: ProviderScope = SingletonScope(), _ builder: @escaping (ProviderResolver) -> T) {
         self.builder = builder
         self.scope = scope
     }
 
-    private let builder: (SwiftPod) -> T
+    private let builder: (ProviderResolver) -> T
     let scope: ProviderScope
 
-    func build(_ pod: SwiftPod) -> T {
-        return builder(pod)
+    func build(_ providerResolver: ProviderResolver) -> T {
+        return builder(providerResolver)
     }
 
     public static func == (lhs: Provider<T>, rhs: Provider<T>) -> Bool {

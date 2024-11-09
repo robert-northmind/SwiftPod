@@ -9,13 +9,15 @@ let package = Package(
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "SwiftPod",
-            targets: ["SwiftPod"]),
+            targets: ["SwiftPod"]
+        ),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "SwiftPod"),
+            name: "SwiftPod"
+        ),
         .testTarget(
             name: "SwiftPodTests",
             dependencies: ["SwiftPod"]
