@@ -7,6 +7,11 @@
 
 import Foundation
 
+// TODO:
+// 1: Make concurrency safe!
+// 2: Add Scope clearing method. And test that child-scopes gets cleared also!
+// 3: Add documentation and examples
+
 public final class SwiftPod: ProviderResolver {
     public init() {}
 
@@ -40,12 +45,7 @@ public final class SwiftPod: ProviderResolver {
             }
         }
 
-        // Check cyclic providers
-        if let processingAnyProviders = processingAnyProviders, processingAnyProviders.contains(anyProvider) {
-            let providerDescriptions = processingAnyProviders.cycleErrorDescription(anyProvider)
-            assert(false, "\n\(providerDescriptions)");
-        }
-        // Passed! Not cycle detected
+        checkCyclicDependency(anyProvider: anyProvider, processingAnyProviders: processingAnyProviders)
 
         let newInstance = provider.build(
             InternalProviderResolver(
@@ -62,6 +62,13 @@ public final class SwiftPod: ProviderResolver {
             }
         }
         return newInstance
+    }
+    
+    private func checkCyclicDependency(anyProvider: AnyProvider, processingAnyProviders: ProcessingAnyProviders?) {
+        if let processingAnyProviders = processingAnyProviders, processingAnyProviders.contains(anyProvider) {
+            let providerDescriptions = processingAnyProviders.cycleErrorDescription(anyProvider)
+            assert(false, "\n\(providerDescriptions)");
+        }
     }
 
     private func isProviderOverridden(_ anyProvider: AnyProvider) -> Bool {
