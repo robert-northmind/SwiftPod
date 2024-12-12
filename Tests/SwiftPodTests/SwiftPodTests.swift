@@ -5,6 +5,7 @@
 //  Created by Robert Magnusson on 21.10.24.
 //
 
+import Foundation
 import Testing
 @testable import SwiftPod
 
@@ -95,6 +96,30 @@ struct SwiftPodTests {
         #expect(overriddenInstance2 is SubTestClass)
         #expect(overriddenInstance1 === overriddenInstance2)
     }
+    
+    @Test("Can handle concurrency. Random int provider should always produce same value for all tasks")
+    func testDependencyCycles() async {
+        let iterations = 40
+
+        let dispatchGroup = DispatchGroup()
+        let queue = DispatchQueue(label: "concurrentQueue", attributes: .concurrent)
+        var resultSet = Set<String>()
+        
+        for _ in 0..<iterations {
+            dispatchGroup.enter()
+            queue.async {
+                Task {
+                    let randomIntAsString = pod.resolve(randomIntAsStringProvider)
+                    await MainActor.run(body: {
+                        resultSet.insert(randomIntAsString)
+                        dispatchGroup.leave()
+                    })
+                }
+            }
+        }
+        await dispatchGroup.waitForCompletion()
+        #expect(resultSet.count == 1)
+    }
  
     private class TestClass {}
     
@@ -106,5 +131,26 @@ struct SwiftPodTests {
     
     private let testStaticProvider = Provider { _ in
         return TestClass()
+    }
+}
+
+// Helpers
+
+let randomIntAsStringProvider = Provider<String>({ pod in
+    let theInt = pod.resolve(randomIntProvider)
+    return "\(theInt)"
+})
+
+let randomIntProvider = Provider<Int>({ _ in
+    return (Int.random(in: 0..<100))
+})
+
+extension DispatchGroup {
+    func waitForCompletion() async {
+        await withCheckedContinuation { continuation in
+            self.notify(queue: .main) {
+                continuation.resume()
+            }
+        }
     }
 }

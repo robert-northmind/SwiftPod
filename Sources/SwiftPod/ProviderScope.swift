@@ -6,7 +6,7 @@
 //
 
 /// Controls the life time of the instances which your providers creates
-public protocol ProviderScope {
+public protocol ProviderScope: Sendable {
     var children: [ProviderScope] { get }
 }
 

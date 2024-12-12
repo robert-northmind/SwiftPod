@@ -8,91 +8,44 @@
 import Foundation
 
 // TODO:
-// 1: Make concurrency safe!
 // 2: Add Scope clearing method. And test that child-scopes gets cleared also!
 // 3: Add documentation and examples
 
-public final class SwiftPod: ProviderResolver {
-    public init() {}
+public final class SwiftPod: ProviderResolver, @unchecked Sendable {
+    public init() {
+        self.providerOverrider = ProviderOverrider(instanceContainer: ProviderInstanceContainer())
+    }
 
-    private var instanceDict = [AnyProvider: Any]()
+    private let dispatchQueue = DispatchQueue(label: "swiftpod.resolve.lock.queue")
 
-    private var overrideInstanceDict = [AnyProvider: Any]()
-    private var overrideProviderBuilderDict = [AnyProvider: AnyProvider]()
-    
+    private let instanceContainer = ProviderInstanceContainer()
+    private let providerOverrider: ProviderOverrider
+
     public func resolve<T>(_ originalProvider: Provider<T>) -> T {
-        return resolve(originalProvider, processingAnyProviders: nil)
-    }
-
-    func resolve<T>(
-        _ originalProvider: Provider<T>,
-        processingAnyProviders: ProcessingAnyProviders?
-    ) -> T {
-        let originalAnyProvider = AnyProvider(originalProvider)
-        let overrideAnyProvider = overrideProviderBuilderDict[originalAnyProvider]
-        let anyProvider = overrideAnyProvider ?? originalAnyProvider
-
-        let wasOverridden = isProviderOverridden(originalAnyProvider)
-        let provider = anyProvider.base as? Provider<T> ?? originalProvider
-        
-        let isAllowedToCacheInstance = !(provider.scope is AlwaysCreateNewScope)
-        
-        if isAllowedToCacheInstance {
-            if wasOverridden, let instance = overrideInstanceDict[anyProvider] as? T {
-                return instance
-            } else if let instance = instanceDict[anyProvider] as? T {
-                return instance
-            }
-        }
-
-        checkCyclicDependency(anyProvider: anyProvider, processingAnyProviders: processingAnyProviders)
-
-        let newInstance = provider.build(
-            InternalProviderResolver(
-                self,
-                processingAnyProviders: ProcessingAnyProviders.getUpdated(processingAnyProviders, withAnyProvider: anyProvider)
+        let theInstance = dispatchQueue.sync {
+            let internalProviderResolver = InternalProviderResolver(
+                instanceContainer: instanceContainer,
+                processingAnyProviders: ProcessingAnyProviders.getInitial(),
+                providerOverrider: providerOverrider
             )
-        )
-        
-        if isAllowedToCacheInstance {
-            if wasOverridden {
-                overrideInstanceDict[anyProvider] = newInstance
-            } else {
-                instanceDict[anyProvider] = newInstance
-            }
+            return internalProviderResolver.resolve(originalProvider)
         }
-        return newInstance
-    }
-    
-    private func checkCyclicDependency(anyProvider: AnyProvider, processingAnyProviders: ProcessingAnyProviders?) {
-        if let processingAnyProviders = processingAnyProviders, processingAnyProviders.contains(anyProvider) {
-            let providerDescriptions = processingAnyProviders.cycleErrorDescription(anyProvider)
-            assert(false, "\n\(providerDescriptions)");
-        }
-    }
-
-    private func isProviderOverridden(_ anyProvider: AnyProvider) -> Bool {
-        return overrideProviderBuilderDict[anyProvider] != nil
+        return theInstance
     }
 
     public func overrideProvider<T>(
         _ provider: Provider<T>,
-        with builder: @escaping (ProviderResolver) -> T,
+        with builder: @escaping @Sendable (ProviderResolver) -> T,
         scope: ProviderScope? = nil
     ) {
-        let anyProvider = AnyProvider(provider)
-        let overrideAnyProvider = AnyProvider(Provider(
-            scope: scope ?? provider.scope,
-            builder
-        ))
-        
-        overrideInstanceDict.removeValue(forKey: anyProvider)
-        overrideProviderBuilderDict[anyProvider] = overrideAnyProvider
+        dispatchQueue.sync {
+            providerOverrider.overrideProvider(provider, with: builder, scope: scope)
+        }
     }
 
     public func removeOverrideProvider<T>(_ provider: Provider<T>) {
-        let anyProvider = AnyProvider(provider)
-        overrideInstanceDict.removeValue(forKey: anyProvider)
-        overrideProviderBuilderDict.removeValue(forKey: anyProvider)
+        dispatchQueue.sync {
+            providerOverrider.removeOverride(forProvider: provider)
+        }
     }
 }
