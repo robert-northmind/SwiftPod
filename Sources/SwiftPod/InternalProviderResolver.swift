@@ -23,16 +23,19 @@ struct InternalProviderResolver: ProviderResolver {
     private let providerOverrider: ProviderOverrider
 
     public func resolve<T>(_ originalProvider: Provider<T>) -> T {
-        let anyProvider = getAnyProvider(originalProvider)
-
-        let wasOverridden = providerOverrider.isProviderOverridden(anyProvider)
-        let provider = anyProvider.base as? Provider<T> ?? originalProvider
+        let anyProvider = AnyProvider(originalProvider)
         
+        let overriddenAnyProvider = providerOverrider.getOverriddenAnyProvider(originalProvider)
+        let wasOverridden = providerOverrider.isProviderOverridden(originalProvider)
+        let provider = (wasOverridden ? overriddenAnyProvider?.base as? Provider<T> : originalProvider) ?? originalProvider
+
         let isAllowedToCacheInstance = !(provider.scope is AlwaysCreateNewScope)
         
         if isAllowedToCacheInstance {
-            if wasOverridden, let overriddenInstance = providerOverrider.getOverriddenProviderInstance(anyProvider) as? T {
-                return overriddenInstance
+            if wasOverridden {
+                if let overriddenInstance = providerOverrider.getOverriddenProviderInstance(originalProvider) as? T {
+                    return overriddenInstance
+                }
             } else if let instance = instanceContainer.get(anyProvider) as? T {
                 return instance
             }
@@ -50,22 +53,16 @@ struct InternalProviderResolver: ProviderResolver {
                 providerOverrider: providerOverrider
             )
         )
-        
+
         if isAllowedToCacheInstance {
             if wasOverridden {
-                providerOverrider.setOverrideInstance(anyProvider, newInstance)
+                providerOverrider.setOverrideInstance(originalProvider, newInstance)
             } else {
                 instanceContainer.set(anyProvider, newInstance)
             }
         }
 
         return newInstance
-    }
-    
-    private func getAnyProvider<T>(_ provider: Provider<T>) -> AnyProvider {
-        let originalAnyProvider = AnyProvider(provider)
-        let overriddenAnyProvider = providerOverrider.getOverriddenAnyProvider(originalAnyProvider)
-        return overriddenAnyProvider ?? originalAnyProvider
     }
     
     private func checkCyclicDependency(anyProvider: AnyProvider, processingAnyProviders: ProcessingAnyProviders?) {

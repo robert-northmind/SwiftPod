@@ -14,47 +14,53 @@ final class ProviderOverrider: @unchecked Sendable {
 
     private let dispatchQueue = DispatchQueue(label: "provider.overrider.lock.queue")
     
-    private var overrideProviderBuilderDict = [AnyProvider: AnyProvider]()
+    private var originalToOverrideProviderDict = [AnyProvider: AnyProvider]()
     private var instanceContainer: ProviderInstanceContainer
-    
-    func getOverriddenAnyProvider(_ anyProvider: AnyProvider) -> AnyProvider? {
+
+    func getOverriddenAnyProvider<T>(_ provider: Provider<T>) -> AnyProvider? {
         let overrideAnyProvider = dispatchQueue.sync {
-            return overrideProviderBuilderDict[anyProvider]
+            let anyProvider = AnyProvider(provider)
+            return originalToOverrideProviderDict[anyProvider]
         }
         return overrideAnyProvider
     }
 
-    func getOverriddenProviderInstance(_ anyProvider: AnyProvider) -> Any? {
-        guard isProviderOverridden(anyProvider) else { return nil }
+    func getOverriddenProviderInstance<T>(_ provider: Provider<T>) -> Any? {
+        guard let overriddenAnyProvider = getOverriddenAnyProvider(provider) else { return nil }
 
         let overriddenInstance = dispatchQueue.sync {
-            return instanceContainer.get(anyProvider)
+            return instanceContainer.get(overriddenAnyProvider)
         }
         return overriddenInstance
     }
 
-    func setOverrideInstance<T>(_ anyProvider: AnyProvider, _ newInstance: T) {
+    func setOverrideInstance<T>(_ provider: Provider<T>, _ newInstance: T) {
+        guard let overriddenAnyProvider = getOverriddenAnyProvider(provider) else { return }
+
         dispatchQueue.sync {
-            instanceContainer.set(anyProvider, newInstance)
+            instanceContainer.set(overriddenAnyProvider, newInstance)
         }
     }
 
-    func isProviderOverridden(_ anyProvider: AnyProvider) -> Bool {
+    func isProviderOverridden<T>(_ provider: Provider<T>) -> Bool {
         let isOverridden = dispatchQueue.sync {
-            return overrideProviderBuilderDict[anyProvider] != nil
+            let anyProvider = AnyProvider(provider)
+            return originalToOverrideProviderDict[anyProvider] != nil
         }
         return isOverridden
     }
     
     func removeOverride<T>(forProvider provider: Provider<T>) {
+        guard let overriddenAnyProvider = getOverriddenAnyProvider(provider) else { return }
+
         dispatchQueue.sync {
+            instanceContainer.remove(overriddenAnyProvider)
             let anyProvider = AnyProvider(provider)
-            instanceContainer.remove(anyProvider)
-            overrideProviderBuilderDict.removeValue(forKey: anyProvider)
+            originalToOverrideProviderDict.removeValue(forKey: anyProvider)
         }
     }
     
-    public func overrideProvider<T>(
+    func overrideProvider<T>(
         _ provider: Provider<T>,
         with builder: @escaping @Sendable (ProviderResolver) -> T,
         scope: ProviderScope? = nil
@@ -65,8 +71,14 @@ final class ProviderOverrider: @unchecked Sendable {
                 Provider(scope: scope ?? provider.scope, builder)
             )
 
-            instanceContainer.remove(anyProvider)
-            overrideProviderBuilderDict[anyProvider] = overrideAnyProvider
+            instanceContainer.remove(overrideAnyProvider)
+            originalToOverrideProviderDict[anyProvider] = overrideAnyProvider
+        }
+    }
+
+    func clearInstances(forScope scope: ProviderScope) {
+        dispatchQueue.sync {
+            instanceContainer.clearAllInstances(forScope: scope)
         }
     }
 }

@@ -8,12 +8,15 @@
 // Type-erased wrapper for Provider
 class AnyProvider: Hashable, CustomStringConvertible {
     let base: Any
+    let scope: ProviderScope
+
     private let buildClosure: (ProviderResolver) -> Any
     private let equalsClosure: (Any) -> Bool
     private let hashClosure: () -> Int
 
     init<T>(_ provider: Provider<T>) {
         self.base = provider
+        self.scope = provider.scope
         self.buildClosure = { providerResolver in
             return provider.build(providerResolver)
         }

@@ -8,8 +8,8 @@
 import Foundation
 
 // TODO:
-// 2: Add Scope clearing method. And test that child-scopes gets cleared also!
 // 3: Add documentation and examples
+// 4: Increase test coverage
 
 public final class SwiftPod: ProviderResolver, @unchecked Sendable {
     public init() {
@@ -46,6 +46,13 @@ public final class SwiftPod: ProviderResolver, @unchecked Sendable {
     public func removeOverrideProvider<T>(_ provider: Provider<T>) {
         dispatchQueue.sync {
             providerOverrider.removeOverride(forProvider: provider)
+        }
+    }
+
+    public func clearInstances(forScope scope: ProviderScope) {
+        dispatchQueue.sync {
+            instanceContainer.clearAllInstances(forScope: scope)
+            providerOverrider.clearInstances(forScope: scope)
         }
     }
 }
