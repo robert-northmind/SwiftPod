@@ -162,7 +162,7 @@ struct SwiftPodTests {
         #expect(childInstance1 === childInstance2)
         #expect(grandChildInstance1 === grandChildInstance2)
 
-        pod.clearInstances(forScope: CustomParentScope())
+        pod.clearCachedInstances(forScope: CustomParentScope())
         
         let parentInstance3 = pod.resolve(testCustomParentScopeProvider)
         let childInstance3 = pod.resolve(testCustomChildScopeProvider)
@@ -190,7 +190,7 @@ struct SwiftPodTests {
         #expect(childInstance1 === childInstance2)
         #expect(grandChildInstance1 === grandChildInstance2)
 
-        pod.clearInstances(forScope: CustomChildScope())
+        pod.clearCachedInstances(forScope: CustomChildScope())
         
         let parentInstance3 = pod.resolve(testCustomParentScopeProvider)
         let childInstance3 = pod.resolve(testCustomChildScopeProvider)
@@ -214,7 +214,7 @@ struct SwiftPodTests {
         #expect(parentInstance1 === parentInstance2)
         #expect(otherInstance1 === otherInstance2)
 
-        pod.clearInstances(forScope: CustomParentScope())
+        pod.clearCachedInstances(forScope: CustomParentScope())
         
         let parentInstance3 = pod.resolve(testCustomParentScopeProvider)
         let otherInstance3 = pod.resolve(testCustomOtherScopeProvider)
@@ -240,7 +240,7 @@ struct SwiftPodTests {
         #expect(overriddenInstance2 is SubTestClass)
         #expect(overriddenInstance1 === overriddenInstance2)
         
-        pod.clearInstances(forScope: CustomParentScope())
+        pod.clearCachedInstances(forScope: CustomParentScope())
         
         let overriddenInstance3 = pod.resolve(testCustomParentScopeProvider)
         #expect(overriddenInstance3 is SubTestClass)
@@ -264,81 +264,36 @@ struct SwiftPodTests {
         #expect(overriddenInstance2 is SubTestClass)
         #expect(overriddenInstance1 === overriddenInstance2)
         
-        pod.clearInstances(forScope: CustomParentScope())
+        pod.clearCachedInstances(forScope: CustomParentScope())
         
         let overriddenInstance3 = pod.resolve(testCustomParentScopeProvider)
         #expect(overriddenInstance3 is SubTestClass)
         #expect(overriddenInstance1 === overriddenInstance3)
         
-        pod.clearInstances(forScope: CustomOtherScope())
+        pod.clearCachedInstances(forScope: CustomOtherScope())
         
         let overriddenInstance4 = pod.resolve(testCustomParentScopeProvider)
         #expect(overriddenInstance3 is SubTestClass)
         #expect(overriddenInstance1 !== overriddenInstance4)
     }
- 
-    private class TestClass {}
     
-    private class SubTestClass: TestClass {}
+    @Test("Clear instances for SingletonScope does not remove the instances")
+    func testClearInstancesForSingletonDoesNotRemoveInstances() {
+        let result1 = pod.resolve(randomIntAsStringProvider)
+        let result2 = pod.resolve(randomIntAsStringProvider)
 
-    private final class CustomParentScope: ProviderScope {
-        let children: [any ProviderScope] = [CustomChildScope()]
+        #expect(result1 == result2)
+
+        pod.clearCachedInstances(forScope: SingletonScope())
+
+        let result3 = pod.resolve(randomIntAsStringProvider)
+
+        #expect(result1 == result3)
     }
 
-    private final class CustomChildScope: ProviderScope {
-        let children: [any ProviderScope] = [CustomGrandChildScope()]
-    }
-
-    private final class CustomGrandChildScope: ProviderScope {
-        let children: [any ProviderScope] = []
-    }
-    
-    private final class CustomOtherScope: ProviderScope {
-        let children: [any ProviderScope] = []
-    }
-
-    private let testAlwaysNewProvider = Provider(scope: AlwaysCreateNewScope()) { _ in
-        return TestClass()
+    @Test("Cyclic dependency fails", .disabled("Cyclic check calls fatalError, which cannot be tested"))
+    func testCyclicProviders() {
+        _ = pod.resolve(cyclicProvider)
     }
     
-    private let testStaticProvider = Provider { _ in
-        return TestClass()
-    }
-
-    private let testCustomParentScopeProvider = Provider(scope: CustomParentScope()) { _ in
-        return TestClass()
-    }
-
-    private let testCustomChildScopeProvider = Provider(scope: CustomChildScope()) { _ in
-        return TestClass()
-    }
-    
-    private let testCustomGrandChildScopeProvider = Provider(scope: CustomGrandChildScope()) { _ in
-        return TestClass()
-    }
-    
-    private let testCustomOtherScopeProvider = Provider(scope: CustomOtherScope()) { _ in
-        return TestClass()
-    }
-}
-
-// Helpers
-
-let randomIntAsStringProvider = Provider<String>({ pod in
-    let theInt = pod.resolve(randomIntProvider)
-    return "\(theInt)"
-})
-
-let randomIntProvider = Provider<Int>({ _ in
-    return (Int.random(in: 0..<100))
-})
-
-extension DispatchGroup {
-    func waitForCompletion() async {
-        await withCheckedContinuation { continuation in
-            self.notify(queue: .main) {
-                continuation.resume()
-            }
-        }
-    }
 }

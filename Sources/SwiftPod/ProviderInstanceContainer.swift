@@ -42,9 +42,13 @@ final class ProviderInstanceContainer: @unchecked Sendable {
 
         while !scopes.isEmpty {
             let currentScope = scopes.removeFirst()
-
             let currentScopeIdentifier = ObjectIdentifier(type(of: currentScope))
-            _ = scopeProvidersDict.removeValue(forKey: currentScopeIdentifier)
+
+            let isSingleTonScope = currentScope is SingletonScope
+            if !isSingleTonScope {
+                _ = scopeProvidersDict.removeValue(forKey: currentScopeIdentifier)
+            }
+
             visitedScopes.insert(currentScopeIdentifier)
             
             for childScope in currentScope.children {

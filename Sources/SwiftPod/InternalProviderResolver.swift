@@ -25,9 +25,9 @@ struct InternalProviderResolver: ProviderResolver {
     public func resolve<T>(_ originalProvider: Provider<T>) -> T {
         let anyProvider = AnyProvider(originalProvider)
         
-        let overriddenAnyProvider = providerOverrider.getOverriddenAnyProvider(originalProvider)
+        let overriddenProvider = providerOverrider.getOverriddenAnyProvider(originalProvider)?.base as? Provider<T>
+        let provider = overriddenProvider ?? originalProvider
         let wasOverridden = providerOverrider.isProviderOverridden(originalProvider)
-        let provider = (wasOverridden ? overriddenAnyProvider?.base as? Provider<T> : originalProvider) ?? originalProvider
 
         let isAllowedToCacheInstance = !(provider.scope is AlwaysCreateNewScope)
         
@@ -68,7 +68,7 @@ struct InternalProviderResolver: ProviderResolver {
     private func checkCyclicDependency(anyProvider: AnyProvider, processingAnyProviders: ProcessingAnyProviders?) {
         if let processingAnyProviders = processingAnyProviders, processingAnyProviders.contains(anyProvider) {
             let providerDescriptions = processingAnyProviders.cycleErrorDescription(anyProvider)
-            assert(false, "\n\(providerDescriptions)");
+            fatalError("\n\(providerDescriptions)")
         }
     }
 }

@@ -8,8 +8,7 @@
 import Foundation
 
 // TODO:
-// 3: Add documentation and examples
-// 4: Increase test coverage
+// 1: Add documentation and examples
 
 public final class SwiftPod: ProviderResolver, @unchecked Sendable {
     public init() {
@@ -49,7 +48,7 @@ public final class SwiftPod: ProviderResolver, @unchecked Sendable {
         }
     }
 
-    public func clearInstances(forScope scope: ProviderScope) {
+    public func clearCachedInstances(forScope scope: ProviderScope) {
         dispatchQueue.sync {
             instanceContainer.clearAllInstances(forScope: scope)
             providerOverrider.clearInstances(forScope: scope)
