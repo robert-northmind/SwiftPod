@@ -22,7 +22,7 @@ struct InternalProviderResolver: ProviderResolver {
     private let processingAnyProviders: ProcessingAnyProviders
     private let providerOverrider: ProviderOverrider
 
-    public func resolve<T>(_ originalProvider: Provider<T>) -> T {
+    func resolve<T>(_ originalProvider: Provider<T>) -> T {
         let anyProvider = AnyProvider(originalProvider)
         
         let overriddenProvider = providerOverrider.getOverriddenAnyProvider(originalProvider)?.base as? Provider<T>

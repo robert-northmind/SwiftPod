@@ -11,11 +11,11 @@ struct ProcessingAnyProvider: Hashable {
     let provider: AnyProvider
     let index: Int
     
-    public static func == (lhs: ProcessingAnyProvider, rhs: ProcessingAnyProvider) -> Bool {
+    static func == (lhs: ProcessingAnyProvider, rhs: ProcessingAnyProvider) -> Bool {
         return lhs.provider === rhs.provider
     }
 
-    public func hash(into hasher: inout Hasher) {
+    func hash(into hasher: inout Hasher) {
         hasher.combine(provider)
     }
 }
