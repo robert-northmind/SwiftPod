@@ -10,7 +10,8 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "ExampleApp",
-            dependencies: [.product(name: "SwiftPod", package: "SwiftPod")]
+            dependencies: [.product(name: "SwiftPod", package: "SwiftPod")],
+            path: "Sources/"
         ),
     ]
 )
