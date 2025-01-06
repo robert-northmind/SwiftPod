@@ -1,0 +1,30 @@
+name: Swift Package CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Swift
+        uses: swift-actions/setup-swift@v1
+
+      - name: Build Swift package
+        run: swift build
+
+      - name: Run tests
+        run: swift test
+
+      - name: Build and Run ExampleApp
+        working-directory: Examples/ExampleApp/
+        run: swift run
