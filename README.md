@@ -1,5 +1,8 @@
 # SwiftPod
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frobert-northmind%2FSwiftPod%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/robert-northmind/SwiftPod)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frobert-northmind%2FSwiftPod%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/robert-northmind/SwiftPod)
+
 **SwiftPod** is a lightweight and easy-to-use Dependency Injection (DI) library for Swift. It’s designed to be straightforward, efficient, and **most importantly** safe!
 
 Unlike many other DI libraries, SwiftPod ensures you won’t ever run into a runtime exception for forgetting to register a dependency before trying to resolve it.
