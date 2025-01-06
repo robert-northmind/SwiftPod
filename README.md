@@ -15,13 +15,22 @@ Unlike many other DI libraries, SwiftPod ensures you won’t ever run into a run
 
 ## Installation
 
-You can add SwiftPod to your project using Swift Package Manager.  
-Add this package as a dependency in your Package.swift:
+### Swift Package Manager (SPM)
 
-```swift
+Add SwiftPod as a dependency in your Package.swift:
+
+```
 dependencies: [
     .package(url: "https://github.com/robert-northmind/SwiftPod", from: "1.0.0")
 ]
+```
+
+### CocoaPods
+
+Integrate SwiftPod into your Xcode project by specifying it in your Podfile:
+
+```
+pod 'SwiftPod-CocoaPods'
 ```
 
 ## Quick Example
