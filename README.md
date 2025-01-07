@@ -21,16 +21,25 @@ Add SwiftPod as a dependency in your Package.swift:
 
 ```
 dependencies: [
-    .package(url: "https://github.com/robert-northmind/SwiftPod", from: "1.0.0")
+    .package(url: "https://github.com/robert-northmind/SwiftPod.git", from: "1.0.7")
 ]
 ```
 
 ### CocoaPods
 
-Integrate SwiftPod into your Xcode project by specifying it in your Podfile:
+**NOTE:**  
+In the CocoaPods registry, another package already claimed the name `SwiftPod`!  
+So if you want to use CocoaPods to integrate SwiftPod, you will need to import it under the name `SwiftPod-CocoaPods`. So you have to add this to your Podfile:
 
 ```
 pod 'SwiftPod-CocoaPods'
+```
+
+**One more NOTE:**  
+This also means that you will need to use a different import statement in your swift code to get access to the library. Here is how your import will look like:
+
+```swift
+import SwiftPod_CocoaPods
 ```
 
 ## Quick Example
