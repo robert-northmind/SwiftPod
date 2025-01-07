@@ -5,7 +5,7 @@
 //  Created by Robert Magnusson on 04.01.25.
 //
 
-import SwiftPod
+import SwiftiePod
 
 /// You can define custom scopes for your providers.
 /// This is useful if you want to keep instances alive for a specific flow of your app,

@@ -1,45 +1,36 @@
-# SwiftPod
+# SwiftiePod
 
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frobert-northmind%2FSwiftPod%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/robert-northmind/SwiftPod)
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frobert-northmind%2FSwiftPod%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/robert-northmind/SwiftPod)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frobert-northmind%2FSwiftiePod%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/robert-northmind/SwiftiePod)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frobert-northmind%2FSwiftiePod%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/robert-northmind/SwiftiePod)
 
-**SwiftPod** is a lightweight and easy-to-use Dependency Injection (DI) library for Swift. It’s designed to be straightforward, efficient, and **most importantly** safe!
+**SwiftiePod** is a lightweight and easy-to-use Dependency Injection (DI) library for Swift. It’s designed to be straightforward, efficient, and **most importantly** safe!
 
-Unlike many other DI libraries, SwiftPod ensures you won’t ever run into a runtime exception for forgetting to register a dependency before trying to resolve it.
+Unlike many other DI libraries, SwiftiePod ensures you won’t ever run into a runtime exception for forgetting to register a dependency before trying to resolve it.
 
-### Why SwiftPod?
+### Why SwiftiePod?
 
-- **Lightweight & Easy:** SwiftPod does exactly what you need without unnecessary complexity. Setup and usage are kept simple and intuitive.
-- **Compile-time Safety:** With SwiftPod, you’ll never get a runtime exception for resolving an unregistered type. SwiftPod’s approach helps you catch issues early, preventing nasty surprises at runtime.
-- **Flexible State Management:** SwiftPod can cache your instances if you want, making it easy to manage singletons or reuse existing objects when appropriate.
+- **Lightweight & Easy:** SwiftiePod does exactly what you need without unnecessary complexity. Setup and usage are kept simple and intuitive.
+- **Compile-time Safety:** With SwiftiePod, you’ll never get a runtime exception for resolving an unregistered type. SwiftiePod’s approach helps you catch issues early, preventing nasty surprises at runtime.
+- **Flexible State Management:** SwiftiePod can cache your instances if you want, making it easy to manage singletons or reuse existing objects when appropriate.
 
 ## Installation
 
 ### Swift Package Manager (SPM)
 
-Add SwiftPod as a dependency in your Package.swift:
+Add SwiftiePod as a dependency in your Package.swift:
 
 ```
 dependencies: [
-    .package(url: "https://github.com/robert-northmind/SwiftPod.git", from: "1.0.7")
+    .package(url: "https://github.com/robert-northmind/SwiftiePod.git", from: "1.0.8")
 ]
 ```
 
 ### CocoaPods
 
-**NOTE:**  
-In the CocoaPods registry, another package already claimed the name `SwiftPod`!  
-So if you want to use CocoaPods to integrate SwiftPod, you will need to import it under the name `SwiftPod-CocoaPods`. So you have to add this to your Podfile:
+Add this to your Podfile:
 
 ```
-pod 'SwiftPod-CocoaPods'
-```
-
-**One more NOTE:**  
-This also means that you will need to use a different import statement in your swift code to get access to the library. Here is how your import will look like:
-
-```swift
-import SwiftPod_CocoaPods
+pod 'SwiftiePod'
 ```
 
 ## Quick Example
@@ -47,10 +38,10 @@ import SwiftPod_CocoaPods
 In some made up business logic called `DataService.swift`:
 
 ```swift
-import SwiftPod
+import SwiftiePod
 
 // Define a `Provider` for the `DataService`.
-// A `Provider` is a SwiftPod thing.
+// A `Provider` is a SwiftiePod thing.
 // It's a thing which knows how to build your types.
 let dataServiceProvider = Provider<DataService> { pod in
     return RemoteDataService(
@@ -78,14 +69,14 @@ class RemoteDataService: DataService {
 In the start code of your app, you setup your pod:
 
 ```swift
-import SwiftPod
-let pod = SwiftPod()
+import SwiftiePod
+let pod = SwiftiePod()
 ```
 
 Finally, when you need an instance of your `DataService` you resolve it from the pod:
 
 ```swift
-import SwiftPod
+import SwiftiePod
 let dataService = pod.resolve(dataServiceProvider)
 // Now you can use the dataService...
 ```
@@ -114,15 +105,15 @@ This approach has some downsides:
 - Risk of crashing your app. What happens if you try to resolve a type which has not yet been registered? 💣💥
 - You end up with a huge "register" section in your app where you need to register all your types.
 
-### SwiftPod - Core concept
+### SwiftiePod - Core concept
 
-SwiftPod takes a different approach. Instead of registering the builder in the container, you define a variable for the builder, called a `Provider`, and then you use this `Provider` to resolve instances from your container. There is no registration part!
+SwiftiePod takes a different approach. Instead of registering the builder in the container, you define a variable for the builder, called a `Provider`, and then you use this `Provider` to resolve instances from your container. There is no registration part!
 
 This way, the container always knows how to build your instances. There will never be any app crashes due to not-registered types.
 
-The two core components in SwiftPod is the `SwiftPod` and the `Providers`.
+The two core components in SwiftiePod is the `SwiftiePod` and the `Providers`.
 
-The `SwiftPod` is your container. You use this to resolve your types.
+The `SwiftiePod` is your container. You use this to resolve your types.
 
 The `Providers` are your builders. You pass these into the `pod` to get instances. For everything which you want to have an instance of, you define a `Provider`. It looks something like this:
 
@@ -194,7 +185,7 @@ class CurrentUserService: CurrentUserServiceProtocol {
 
 When you create your `Provider` you can also specify how its instances should be cached. You control this using the `Scope` parameter.
 
-Out of the box, `SwiftPod` provides you with 2 predefined scopes: `AlwaysCreateNewScope` and `SingletonScope`.
+Out of the box, `SwiftiePod` provides you with 2 predefined scopes: `AlwaysCreateNewScope` and `SingletonScope`.
 
 As you might be able to guess from the names, the `AlwaysCreateNewScope` will never cache instances. Every time you resolve a provider with this scope, it will run the builder and create a new instance.
 
@@ -255,16 +246,16 @@ let string1 = pod.resolve(myAppTitleProvider) // <-- "My cool app"
 let string2 = pod.resolve(myAppDescriptionProvider) // <-- "This is a really exciting and cool app"
 ```
 
-### The SwiftPod
+### The SwiftiePod
 
 The main task of the pod is to let you resolve providers to get some instances. 💃🪩🕺
 
 Somewhere in your app you will need to define your pod by doing:
 
 ```swift
-import SwiftPod
+import SwiftiePod
 ...
-let pod = SwiftPod()
+let pod = SwiftiePod()
 ```
 
 This is then the pod which you will use through your application.
@@ -302,7 +293,7 @@ Providers which are using the `SingletonScope` will ignore the `clearCachedInsta
 
 ## Contributing
 
-If you find a bug, want to request a new feature, or contribute in any other way, please [open an issue](https://github.com/robert-northmind/SwiftPod/issues/new/choose) or submit a pull request.
+If you find a bug, want to request a new feature, or contribute in any other way, please [open an issue](https://github.com/robert-northmind/SwiftiePod/issues/new/choose) or submit a pull request.
 
 ## License
 

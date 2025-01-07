@@ -5,7 +5,7 @@
 //  Created by Robert Magnusson on 04.01.25.
 //
 
-import SwiftPod
+import SwiftiePod
 
 /// You can use the `pod` parameter to resolve other 
 /// types which you might need to create your services.

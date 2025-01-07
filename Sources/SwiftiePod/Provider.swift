@@ -1,6 +1,6 @@
 //
 //  Provider.swift
-//  SwiftPod
+//  SwiftiePod
 //
 //  Created by Robert Magnusson on 17.10.24.
 //
@@ -23,7 +23,7 @@
 /// }
 /// ```
 ///
-/// Then you pass this provider into the `SwiftPod` to get an instance
+/// Then you pass this provider into the `SwiftiePod` to get an instance
 ///
 /// ```
 /// let myService = pod.resolve(myServiceProvider)

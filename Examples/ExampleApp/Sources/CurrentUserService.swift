@@ -5,7 +5,7 @@
 //  Created by Robert Magnusson on 04.01.25.
 //
 
-import SwiftPod
+import SwiftiePod
 
 /// You can explicitly define the type for your provider as we do here.
 /// This is useful when you are working with protocols.

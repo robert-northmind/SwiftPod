@@ -5,7 +5,7 @@
 //  Created by Robert Magnusson on 04.01.25.
 //
 
-import SwiftPod
+import SwiftiePod
 
 /// By using `AlwaysCreateNewScope` you make sure to
 /// never cache the instances for `someClassFactoryProvider`.

@@ -1,6 +1,6 @@
 //
 //  ProviderOverrider.swift
-//  SwiftPod
+//  SwiftiePod
 //
 //  Created by Robert Magnusson on 11.12.24.
 //

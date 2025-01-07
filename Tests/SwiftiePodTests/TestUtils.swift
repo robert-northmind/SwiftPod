@@ -1,12 +1,12 @@
 //
 //  TestUtils.swift
-//  SwiftPod
+//  SwiftiePod
 //
 //  Created by Robert Magnusson on 22.12.24.
 //
 
 import Foundation
-@testable import SwiftPod
+@testable import SwiftiePod
 
 class TestClass {}
 

@@ -5,7 +5,7 @@
 //  Created by Robert Magnusson on 04.01.25.
 //
 
-import SwiftPod
+import SwiftiePod
 
 let randomNumberProvider = Provider(scope: AlwaysCreateNewScope()) { _ in
     return pod.resolve(randomNumberGeneratorProvider).value

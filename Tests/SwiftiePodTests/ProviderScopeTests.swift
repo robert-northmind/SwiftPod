@@ -1,12 +1,12 @@
 //
 //  ProviderScopeTests.swift
-//  SwiftPod
+//  SwiftiePod
 //
 //  Created by Robert Magnusson on 21.10.24.
 //
 
 import Testing
-@testable import SwiftPod
+@testable import SwiftiePod
 
 struct ProviderScopeTests {
     @Test("AlwaysCreateNewScope has no children")

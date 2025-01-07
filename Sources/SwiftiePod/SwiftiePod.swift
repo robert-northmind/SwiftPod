@@ -1,6 +1,6 @@
 //
-//  SwiftPod.swift
-//  SwiftPod
+//  SwiftiePod.swift
+//  SwiftiePod
 //
 //  Created by Robert Magnusson on 17.10.24.
 //
@@ -9,23 +9,23 @@ import Foundation
 
 /// The pod/container which you use to get get instances from your providers.
 ///
-/// Create an instance of a `SwiftPod` once in your application  and then use this throughout your application to get instances.
+/// Create an instance of a `SwiftiePod` once in your application  and then use this throughout your application to get instances.
 ///
 /// ```
 /// // Somewhere in the start up phase of your application
-/// let pod = SwiftPod()
+/// let pod = SwiftiePod()
 /// ...
 /// // Later in your application logic when you need an instance
 /// let someInstance = pod.resolve(someInstanceProvider)
 /// ```
 ///
-/// Also use the SwiftPod instance to control overrides of provider and caching of instances.
-public final class SwiftPod: ProviderResolver, @unchecked Sendable {
+/// Also use the SwiftiePod instance to control overrides of provider and caching of instances.
+public final class SwiftiePod: ProviderResolver, @unchecked Sendable {
     public init() {
         self.providerOverrider = ProviderOverrider(instanceContainer: ProviderInstanceContainer())
     }
 
-    private let dispatchQueue = DispatchQueue(label: "swiftpod.resolve.lock.queue")
+    private let dispatchQueue = DispatchQueue(label: "SwiftiePod.resolve.lock.queue")
 
     private let instanceContainer = ProviderInstanceContainer()
     private let providerOverrider: ProviderOverrider

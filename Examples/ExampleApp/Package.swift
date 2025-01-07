@@ -5,12 +5,12 @@ import PackageDescription
 let package = Package(
     name: "ExampleApp",
     dependencies: [
-        .package(path: "../../../SwiftPod")
+        .package(path: "../../../SwiftiePod")
     ],
     targets: [
         .executableTarget(
             name: "ExampleApp",
-            dependencies: [.product(name: "SwiftPod", package: "SwiftPod")],
+            dependencies: [.product(name: "SwiftiePod", package: "SwiftiePod")],
             path: "Sources/"
         ),
     ]

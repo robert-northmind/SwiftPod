@@ -1,12 +1,12 @@
 //
 //  ProviderTests.swift
-//  SwiftPod
+//  SwiftiePod
 //
 //  Created by Robert Magnusson on 21.10.24.
 //
 
 import Testing
-@testable import SwiftPod
+@testable import SwiftiePod
 
 struct ProviderTests {
     let provider1 = Provider(scope: AlwaysCreateNewScope()) { _ in
@@ -28,7 +28,7 @@ struct ProviderTests {
     
     @Test("Test build method of 2 different providers with same return value are same")
     func testProviderValueEquality() throws {
-        let pod = SwiftPod()
+        let pod = SwiftiePod()
         let value1 = provider1.build(pod)
         let value2 = provider2.build(pod)
 

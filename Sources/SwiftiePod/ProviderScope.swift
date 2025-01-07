@@ -1,6 +1,6 @@
 //
 //  ProviderScope.swift
-//  SwiftPod
+//  SwiftiePod
 //
 //  Created by Robert Magnusson on 17.10.24.
 //

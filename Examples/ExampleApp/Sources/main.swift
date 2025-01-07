@@ -1,9 +1,9 @@
-import SwiftPod
+import SwiftiePod
 
 print("## Starting example app")
 
 // Create your pod. You then use this throughout your app to resolve your types.
-let pod = SwiftPod()
+let pod = SwiftiePod()
 
 // Use the pod to get the instances of SomeClass.
 // Never create the instance directly in code.

@@ -1,20 +1,20 @@
 //
 //  ProviderScopeTests.swift
-//  SwiftPod
+//  SwiftiePod
 //
 //  Created by Robert Magnusson on 21.10.24.
 //
 
 import Foundation
 import Testing
-@testable import SwiftPod
+@testable import SwiftiePod
 
-struct SwiftPodTests {
+struct SwiftiePodTests {
     init() {
-      pod = SwiftPod()
+      pod = SwiftiePod()
     }
     
-    var pod: SwiftPod
+    var pod: SwiftiePod
 
     @Test("AlwaysCreateNewScope always creates a new instance")
     func testWithAlwaysCreateNewScope() async throws {
